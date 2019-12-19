@@ -1,0 +1,58 @@
+一：DDL
+规定数据库DBlee，表TBlee，
+hive数据库创建：hive数据存储在hdfs上，使用hdfs作为数据存储
+创建数据库的语句：
+create database if not exists DBlee
+location '/user/hive/DBLEE.db'
+所创建的数据库（命名空间）:/hive.metestore.warehouse.dir中定义的目录下/DBLEE.db/DBLee
+Hive所管理的所有数据都存储在使用hive定义的顶层目录下，即hive-site.xml文件中metastore.warehouse.dir的参数配置
+创建完数据库之后可以使用：
+describe database extended DBlee;来查看数据库的属性；
+show databases like '*lee*'；来列出Metastore中所有的数据库
+一旦创建了数据库之后，就可以修改数据库的元数据的属性：
+alter database DBLee
+set dbproperties/owner （'department'='sales'）;
+也可以删除数据库：
+drop database DBlee []/[cascade]/[restrict]
+csacade:删除数据库，连同数据库里面的表（外部表，内部表）也一起删除；
+restrict：删除数据库时，如果数据库中有表则将删除失败，同不写的时候的默认行为
+
+二：hive所支持的数据类型：
+数组，Map，结构体，联合体
+  数组：由一组数据类型的数据元素构成的有序数据复合集
+stringitems Array <"this is a element","this is a array","i am not null">
+字符串数组在定义赋值完成之后，可以通过下标索引进行数据的精确获取
+stringitems[0],,,,,
+  Map是无序键/值对集合，键可以是hive所支持的任意一种简单数据类型，值可以是简单类型或者复杂数据类型
+Map的数据元素的访问需要使用值对应的键来访问
+Basketmap MAP<'string','iam a basket'>
+Basketmap MAP<"Eggs",'12'>
+数据是通过map（）函数完成存储和输出显示的
+Basketmap("Eggs") returns 12
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
