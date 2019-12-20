@@ -1,0 +1,46 @@
+一：为内外部表添加表分区：
+1.为外部表添加表分区：
+创建HDFS数据存放目录，
+Hadoop fs -mkdir /user/demo/ids
+Hadoop fs -mkdir /user/demo/ids/2016-05-31
+Hadoop fs -mkdir /user/demo/ids/2016-05-30
+上传数据文件到目录下：
+Hadoop fs -put /tmp/2016-05-31.txt /user/demo/ids/2016-05-31/
+hadoop fs -put /tmp/2016-05-30.txt /user/demo/ids/2016-05-30/
+创建外部分区表：
+create external table ids（a int）partitioned by (datestamp String) location '/user/demo/ids';
+为分区表分区赋值：
+alter table ids add partition（datastamp='2016-05-30'）location '/user/demo/ids/2016-05-30';
+
+查询分区表数据：
+select * from ids；
+可查询到数据
+
+创建数据文件目录，加载数据文件置目录下，在相同目录下创建分区表，给分区表分区键赋值，查询此分区表即可查询到数据
+原因是，一份数据在数据表中被记录规划，所以可查到！（注意相同路径）
+
+同样还可以为该表添加其他分区：
+alter table ids add partition (datestamp='2016-05-31')location '/user/demo/ids/2016-05-31';(此目录下的数据文件被记录规划到表中了)
+查询表中分区的数据：
+select * from  ids；
+也可查询到数据；
+2.为内部表创建添加新分区
+首先创建一张内部表：
+create table ids_innerTable(a int)partition by (datastamp String);
+有个问题是：创建完表之后会发生样的事情？查询表数据是怎么样查询到的？
+为内部表的两个分区添加数据：
+insert into ids_innerTable partition(datastamp='2016-05-30')values(1);
+insert into ids_innerTable partition(datastamp='2016-05-31')values(11);
+在该表目录下创建一个新的字目录并添加一个文件：
+Hadoop fs -mkdir /apps/hive/warehouse/ids_internal/datastamp=2016-05-21
+hadoop fs -put /tmp/2016-05-21.txt  /apps/hive/warehouse/ids_innerTable/datastamp=2016-05-21
+使用msck repair table 为内部表添加新分区
+msck repair table 内部表名；
+该命令为内部表检查/apps/hive/warehouse/ids_internal下的子目录，如果找到新的子目录将会把它作为新的分区添加到ids_innerTable表中。这种方式对新的
+分区目录一次性全部更新表定义很有效；
+Hive数据库
+本质上是一个用于保存一组表的元数据信息的命名空间。
+从文件系统层来看，模式就是一个目录，其中存储属于该命名空间的所有内部表
+
+
+
